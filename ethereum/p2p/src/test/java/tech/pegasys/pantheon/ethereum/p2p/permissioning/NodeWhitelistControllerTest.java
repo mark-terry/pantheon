@@ -24,10 +24,7 @@ import java.util.Arrays;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NodeWhitelistControllerTest {
 
   private NodeWhitelistController controller;
@@ -39,7 +36,7 @@ public class NodeWhitelistControllerTest {
 
   @Before
   public void setUp() {
-    controller = new NodeWhitelistController(new PermissioningConfiguration());
+    controller = new NodeWhitelistController(PermissioningConfiguration.createDefault());
   }
 
   @Test

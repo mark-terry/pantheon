@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -32,15 +33,16 @@ public class AccountWhitelistControllerTest {
 
   private AccountWhitelistController controller;
   @Mock private PermissioningConfiguration permissioningConfig;
+  @Mock private WhitelistPersistor whitelistPersistor;
 
   @Before
   public void before() {
-    controller = new AccountWhitelistController(permissioningConfig);
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
   }
 
   @Test
   public void newInstanceWithNullPermConfigShouldHaveAccountWhitelistNotSet() {
-    controller = new AccountWhitelistController(null);
+    controller = new AccountWhitelistController(null, whitelistPersistor);
 
     assertThat(controller.isAccountWhiteListSet()).isFalse();
   }
@@ -48,7 +50,7 @@ public class AccountWhitelistControllerTest {
   @Test
   public void whenAccountWhitelistIsNotSetContainsShouldReturnTrue() {
     when(permissioningConfig.isAccountWhitelistSet()).thenReturn(false);
-    controller = new AccountWhitelistController(permissioningConfig);
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.contains("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73")).isTrue();
   }
@@ -57,8 +59,8 @@ public class AccountWhitelistControllerTest {
   public void whenPermConfigHasAccountsShouldSetAccountsWhitelist() {
     when(permissioningConfig.isAccountWhitelistSet()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
-        .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig);
+        .thenReturn(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.isAccountWhiteListSet()).isTrue();
   }
@@ -67,8 +69,8 @@ public class AccountWhitelistControllerTest {
   public void whenPermConfigHasAccountsShouldAddAllAccountsToWhitelist() {
     when(permissioningConfig.isAccountWhitelistSet()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
-        .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig);
+        .thenReturn(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.getAccountWhitelist())
         .contains("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
@@ -78,14 +80,14 @@ public class AccountWhitelistControllerTest {
   public void whenPermConfigContainsEmptyListOfAccountsContainsShouldReturnFalse() {
     when(permissioningConfig.isAccountWhitelistSet()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist()).thenReturn(new ArrayList<>());
-    controller = new AccountWhitelistController(permissioningConfig);
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.contains("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73")).isFalse();
   }
 
   @Test
   public void addAccountsWithInvalidAccountShouldReturnInvalidEntryResult() {
-    AddResult addResult = controller.addAccounts(Arrays.asList("0x0"));
+    AddResult addResult = controller.addAccounts(singletonList("0x0"));
 
     assertThat(addResult).isEqualTo(AddResult.ERROR_INVALID_ENTRY);
     assertThat(controller.getAccountWhitelist()).isEmpty();
@@ -93,9 +95,9 @@ public class AccountWhitelistControllerTest {
 
   @Test
   public void addExistingAccountShouldReturnExistingEntryResult() {
-    controller.addAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+    controller.addAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
     AddResult addResult =
-        controller.addAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+        controller.addAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     assertThat(addResult).isEqualTo(AddResult.ERROR_EXISTING_ENTRY);
     assertThat(controller.getAccountWhitelist())
@@ -105,7 +107,7 @@ public class AccountWhitelistControllerTest {
   @Test
   public void addValidAccountsShouldReturnSuccessResult() {
     AddResult addResult =
-        controller.addAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+        controller.addAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     assertThat(addResult).isEqualTo(AddResult.SUCCESS);
     assertThat(controller.getAccountWhitelist())
@@ -114,10 +116,10 @@ public class AccountWhitelistControllerTest {
 
   @Test
   public void removeExistingAccountShouldReturnSuccessResult() {
-    controller.addAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+    controller.addAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     RemoveResult removeResult =
-        controller.removeAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+        controller.removeAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     assertThat(removeResult).isEqualTo(RemoveResult.SUCCESS);
     assertThat(controller.getAccountWhitelist()).isEmpty();
@@ -126,7 +128,7 @@ public class AccountWhitelistControllerTest {
   @Test
   public void removeAbsentAccountShouldReturnAbsentEntryResult() {
     RemoveResult removeResult =
-        controller.removeAccounts(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+        controller.removeAccounts(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     assertThat(removeResult).isEqualTo(RemoveResult.ERROR_ABSENT_ENTRY);
     assertThat(controller.getAccountWhitelist()).isEmpty();
@@ -134,7 +136,7 @@ public class AccountWhitelistControllerTest {
 
   @Test
   public void removeInvalidAccountShouldReturnInvalidEntryResult() {
-    RemoveResult removeResult = controller.removeAccounts(Arrays.asList("0x0"));
+    RemoveResult removeResult = controller.removeAccounts(singletonList("0x0"));
 
     assertThat(removeResult).isEqualTo(RemoveResult.ERROR_INVALID_ENTRY);
     assertThat(controller.getAccountWhitelist()).isEmpty();

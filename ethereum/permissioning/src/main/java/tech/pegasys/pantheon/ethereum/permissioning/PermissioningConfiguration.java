@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class PermissioningConfiguration {
+  private String configurationFilePath;
   private List<URI> nodeWhitelist;
   private List<String> accountWhitelist;
   private boolean nodeWhitelistSet;
@@ -32,6 +33,8 @@ public class PermissioningConfiguration {
     final PermissioningConfiguration config = new PermissioningConfiguration();
     config.nodeWhitelist = new ArrayList<>();
     config.accountWhitelist = new ArrayList<>();
+    // TODO: This needs to be corrected in future
+    config.configurationFilePath = "";
     return config;
   }
 
@@ -40,6 +43,14 @@ public class PermissioningConfiguration {
       this.nodeWhitelist.addAll(nodeWhitelist);
       this.nodeWhitelistSet = true;
     }
+  }
+
+  public String getConfigurationFilePath() {
+    return configurationFilePath;
+  }
+
+  public void setConfigurationFilePath(final String configurationFilePath) {
+    this.configurationFilePath = configurationFilePath;
   }
 
   public boolean isNodeWhitelistSet() {

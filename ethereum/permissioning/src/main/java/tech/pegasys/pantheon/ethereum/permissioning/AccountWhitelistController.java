@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.io.IOException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,10 +23,17 @@ import java.util.List;
 public class AccountWhitelistController {
 
   private static final int ACCOUNT_BYTES_SIZE = 20;
-  private final List<String> accountWhitelist = new ArrayList<>();
+  private List<String> accountWhitelist = new ArrayList<>();
   private boolean isAccountWhitelistSet = false;
+  private final WhitelistPersistor whitelistPersistor;
 
   public AccountWhitelistController(final PermissioningConfiguration configuration) {
+    this(configuration, new WhitelistPersistor(configuration.getConfigurationFilePath()));
+  }
+
+  public AccountWhitelistController(
+      final PermissioningConfiguration configuration, final WhitelistPersistor whitelistPersistor) {
+    this.whitelistPersistor = whitelistPersistor;
     if (configuration != null && configuration.isAccountWhitelistSet()) {
       addAccounts(configuration.getAccountWhitelist());
     }
@@ -44,8 +53,17 @@ public class AccountWhitelistController {
       return AddResult.ERROR_EXISTING_ENTRY;
     }
 
+    final boolean wasAccountWhitelistSet = this.isAccountWhitelistSet;
+    final List<String> oldWhitelist = new ArrayList<>(this.accountWhitelist);
+
     this.isAccountWhitelistSet = true;
     this.accountWhitelist.addAll(accounts);
+    try {
+      updateConfigurationFile(accounts);
+    } catch (IOException e) {
+      revertState(wasAccountWhitelistSet, oldWhitelist);
+      return AddResult.ERROR_WHITELIST_PERSIST_FAIL;
+    }
     return AddResult.SUCCESS;
   }
 
@@ -62,8 +80,30 @@ public class AccountWhitelistController {
       return RemoveResult.ERROR_ABSENT_ENTRY;
     }
 
+    final List<String> oldWhitelist = new ArrayList<>(this.accountWhitelist);
+
     this.accountWhitelist.removeAll(accounts);
+
+    try {
+      updateConfigurationFile(accounts);
+    } catch (IOException e) {
+      revertState(oldWhitelist);
+      return RemoveResult.ERROR_WHITELIST_PERSIST_FAIL;
+    }
     return RemoveResult.SUCCESS;
+  }
+
+  private void updateConfigurationFile(final List<String> accounts) throws IOException {
+    whitelistPersistor.updateConfig(WhitelistPersistor.WHITELIST_TYPE.ACCOUNTS, accounts);
+  }
+
+  private void revertState(final List<String> accountWhitelist) {
+    this.accountWhitelist = accountWhitelist;
+  }
+
+  private void revertState(final boolean whitelistSet, final List<String> accountWhitelist) {
+    this.isAccountWhitelistSet = whitelistSet;
+    revertState(accountWhitelist);
   }
 
   private boolean inputHasDuplicates(final List<String> accounts) {
@@ -99,13 +139,15 @@ public class AccountWhitelistController {
     SUCCESS,
     ERROR_DUPLICATED_ENTRY,
     ERROR_EXISTING_ENTRY,
-    ERROR_INVALID_ENTRY
+    ERROR_INVALID_ENTRY,
+    ERROR_WHITELIST_PERSIST_FAIL
   }
 
   public enum RemoveResult {
     SUCCESS,
     ERROR_ABSENT_ENTRY,
     ERROR_INVALID_ENTRY,
-    ERROR_DUPLICATED_ENTRY
+    ERROR_DUPLICATED_ENTRY,
+    ERROR_WHITELIST_PERSIST_FAIL
   }
 }

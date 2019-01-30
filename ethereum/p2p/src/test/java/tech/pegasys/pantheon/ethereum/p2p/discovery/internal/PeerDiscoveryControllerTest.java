@@ -885,15 +885,14 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotBondWithNonWhitelistedPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotBondWithNonWhitelistedPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
     final DiscoveryPeer otherPeer2 = peers.get(2);
 
     final PeerBlacklist blacklist = new PeerBlacklist();
-    final PermissioningConfiguration config = new PermissioningConfiguration();
+    final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
     NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
 
     // Whitelist peers

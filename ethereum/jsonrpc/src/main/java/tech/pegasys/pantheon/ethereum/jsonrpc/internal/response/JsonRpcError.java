@@ -55,6 +55,8 @@ public enum JsonRpcError {
   ACCOUNT_WHITELIST_EXISTING_ENTRY(-32000, "Can't add existing account to whitelist"),
   ACCOUNT_WHITELIST_ABSENT_ENTRY(-32000, "Can't remove absent account from whitelist"),
   ACCOUNT_WHITELIST_INVALID_ENTRY(-32000, "Can't add invalid account address to the whitelist"),
+  WHITELIST_PERSIST_FAILURE(
+      -32000, "Unable to persist changes to whitelist configuration file. Changes reverted."),
 
   // Node whitelist errors
   NODE_WHITELIST_NOT_SET(-32000, "Node whitelist has not been set"),

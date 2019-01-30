@@ -71,6 +71,7 @@ public class PermissioningConfigurationBuilder {
         permissioningConfiguration.setAccountWhitelist(new ArrayList<>());
       }
     }
+
     if (permissionedNodeEnabled) {
       if (nodeWhitelistTomlArray != null) {
         List<URI> nodesWhitelistToml =
