@@ -59,7 +59,7 @@ public class AccountWhitelistController {
     this.isAccountWhitelistSet = true;
     this.accountWhitelist.addAll(accounts);
     try {
-      updateConfigurationFile(accounts);
+      updateConfigurationFile(accountWhitelist);
     } catch (IOException e) {
       revertState(wasAccountWhitelistSet, oldWhitelist);
       return AddResult.ERROR_WHITELIST_PERSIST_FAIL;
@@ -85,7 +85,7 @@ public class AccountWhitelistController {
     this.accountWhitelist.removeAll(accounts);
 
     try {
-      updateConfigurationFile(accounts);
+      updateConfigurationFile(accountWhitelist);
     } catch (IOException e) {
       revertState(oldWhitelist);
       return RemoveResult.ERROR_WHITELIST_PERSIST_FAIL;

@@ -74,8 +74,7 @@ public class NodeWhitelistController {
 
     peers.forEach(this::addNode);
     try {
-      whitelistPersistor.updateConfig(
-          WhitelistPersistor.WHITELIST_TYPE.NODES, peerToEnodeURI(peers));
+      updateConfigurationFile(peerToEnodeURI(nodesWhitelist));
     } catch (IOException e) {
       revertState(wasNodeWhitelistSet, oldWhitelist);
       return new NodesWhitelistResult(
@@ -107,14 +106,17 @@ public class NodeWhitelistController {
 
     peers.forEach(this::removeNode);
     try {
-      whitelistPersistor.updateConfig(
-          WhitelistPersistor.WHITELIST_TYPE.NODES, peerToEnodeURI(peers));
+      updateConfigurationFile(peerToEnodeURI(nodesWhitelist));
     } catch (IOException e) {
       revertState(oldWhitelist);
       return new NodesWhitelistResult(
           NodesWhitelistResultType.ERROR_WHITELIST_PERSIST_FAIL, WHITELIST_FAIL_MESSAGE);
     }
     return new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS);
+  }
+
+  private void updateConfigurationFile(final Collection<String> nodes) throws IOException {
+    whitelistPersistor.updateConfig(WhitelistPersistor.WHITELIST_TYPE.NODES, nodes);
   }
 
   private void revertState(final List<Peer> nodesWhitelist) {
@@ -126,8 +128,8 @@ public class NodeWhitelistController {
     revertState(nodesWhitelist);
   }
 
-  private Collection<String> peerToEnodeURI(final Collection<DefaultPeer> peers) {
-    return peers.parallelStream().map(DefaultPeer::getEnodeURI).collect(Collectors.toList());
+  private Collection<String> peerToEnodeURI(final Collection<Peer> peers) {
+    return peers.parallelStream().map(Peer::getEnodeURI).collect(Collectors.toList());
   }
 
   public boolean isPermitted(final Peer node) {
