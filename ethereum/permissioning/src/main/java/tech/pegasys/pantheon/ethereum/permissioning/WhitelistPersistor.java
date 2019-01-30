@@ -76,7 +76,14 @@ public class WhitelistPersistor {
       final WHITELIST_TYPE whitelistType, final Collection<String> whitelistValues)
       throws IOException {
     String newConfigItem =
-        String.format("%s=%s", whitelistType.getTomlKey(), String.join(",", whitelistValues));
+        String.format(
+            "%s=[%s]",
+            whitelistType.getTomlKey(),
+            whitelistValues
+                .parallelStream()
+                .map(uri -> String.format("\"%s\"", uri))
+                .collect(Collectors.joining(",")));
+
     Files.write(
         configurationFile.toPath(),
         newConfigItem.getBytes(Charsets.UTF_8),
