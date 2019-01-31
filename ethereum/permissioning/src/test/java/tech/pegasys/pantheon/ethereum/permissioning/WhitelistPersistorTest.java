@@ -113,23 +113,28 @@ public class WhitelistPersistorTest {
   }
 
   private long countLines() throws IOException {
-    return Files.lines(tempFile.toPath()).count();
+    try (Stream<String> lines = Files.lines(tempFile.toPath())) {
+      return lines.count();
+    }
   }
 
   private boolean hasKey(final WHITELIST_TYPE key) throws IOException {
-    Stream<String> lines = Files.lines(tempFile.toPath());
-    return lines.anyMatch(s -> s.startsWith(key.getTomlKey()));
+    try (Stream<String> lines = Files.lines(tempFile.toPath())) {
+      return lines.anyMatch(s -> s.startsWith(key.getTomlKey()));
+    }
   }
 
   private boolean hasKeyAndContainsValue(final WHITELIST_TYPE key, final String value)
       throws IOException {
-    Stream<String> lines = Files.lines(tempFile.toPath());
-    return lines.anyMatch(s -> s.startsWith(key.getTomlKey()) && s.contains(value));
+    try (Stream<String> lines = Files.lines(tempFile.toPath())) {
+      return lines.anyMatch(s -> s.startsWith(key.getTomlKey()) && s.contains(value));
+    }
   }
 
   private boolean hasKeyAndExactLineContent(final WHITELIST_TYPE key, final String exactKeyValue)
       throws IOException {
-    Stream<String> lines = Files.lines(tempFile.toPath());
-    return lines.anyMatch(s -> s.startsWith(key.getTomlKey()) && s.equals(exactKeyValue));
+    try (Stream<String> lines = Files.lines(tempFile.toPath())) {
+      return lines.anyMatch(s -> s.startsWith(key.getTomlKey()) && s.equals(exactKeyValue));
+    }
   }
 }
