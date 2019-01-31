@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -161,6 +162,20 @@ public class PantheonNodeFactory {
             .build());
   }
 
+  public PantheonNode createNodeWithPermissionsFile(final String name) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setConfigurationFilePath(
+        File.createTempFile("temp", "temp").getPath());
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
   public PantheonNode createNodeWithNodesWhitelist(
       final String name, final List<URI> nodesWhitelist) throws IOException {
     PermissioningConfiguration permissioningConfiguration =
@@ -180,33 +195,14 @@ public class PantheonNodeFactory {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+    permissioningConfiguration.setConfigurationFilePath(
+        File.createTempFile("temp", "temp").getPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
-            .setPermissioningConfiguration(permissioningConfiguration)
-            .build());
-  }
-
-  public PantheonNode createNodeWithNodesWhitelistAndPermRPC(
-      final String name, final List<URI> nodesWhitelist) throws IOException {
-    PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-
-    JsonRpcConfiguration rpcConfig = JsonRpcConfiguration.createDefault();
-
-    rpcConfig.setEnabled(true);
-    rpcConfig.setPort(0);
-    rpcConfig.setHostsWhitelist(singletonList("*"));
-    rpcConfig.addRpcApi(RpcApis.PERM);
-
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setJsonRpcConfiguration(rpcConfig)
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
   }
