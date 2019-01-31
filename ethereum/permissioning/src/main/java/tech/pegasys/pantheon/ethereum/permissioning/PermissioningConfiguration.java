@@ -32,7 +32,6 @@ public class PermissioningConfiguration {
     final PermissioningConfiguration config = new PermissioningConfiguration();
     config.nodeWhitelist = new ArrayList<>();
     config.accountWhitelist = new ArrayList<>();
-    // TODO: This needs to be corrected in future
     config.configurationFilePath = "";
     return config;
   }

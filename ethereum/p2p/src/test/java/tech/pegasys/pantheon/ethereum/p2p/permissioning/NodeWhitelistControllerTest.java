@@ -12,21 +12,36 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
 import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResultType;
 
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class NodeWhitelistControllerTest {
 
+  @Mock private WhitelistPersistor whitelistPersistor;
   private NodeWhitelistController controller;
 
   private final String enode1 =
@@ -36,7 +51,8 @@ public class NodeWhitelistControllerTest {
 
   @Before
   public void setUp() {
-    controller = new NodeWhitelistController(PermissioningConfiguration.createDefault());
+    controller =
+        new NodeWhitelistController(PermissioningConfiguration.createDefault(), whitelistPersistor);
   }
 
   @Test
@@ -84,5 +100,28 @@ public class NodeWhitelistControllerTest {
             Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode1)));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
+  }
+
+  @Test
+  public void stateShouldRevertIfWhitelistPersistFails() throws IOException {
+    List<Peer> newNode1 = singletonList(DefaultPeer.fromURI(enode1));
+    List<Peer> newNode2 = singletonList(DefaultPeer.fromURI(enode2));
+
+    assertThat(controller.nodeWhitelistSet()).isFalse();
+    assertThat(controller.getNodesWhitelist().size()).isEqualTo(0);
+
+    controller.addNodes(newNode1);
+    assertThat(controller.nodeWhitelistSet()).isTrue();
+    assertThat(controller.getNodesWhitelist().size()).isEqualTo(1);
+
+    doThrow(new IOException()).when(whitelistPersistor).updateConfig(any(), any());
+    controller.addNodes(newNode2);
+
+    assertThat(controller.nodeWhitelistSet()).isTrue();
+    assertThat(controller.getNodesWhitelist().size()).isEqualTo(1);
+    assertThat(controller.getNodesWhitelist()).isEqualTo(newNode1);
+
+    verify(whitelistPersistor, times(2)).updateConfig(any(), any());
+    verifyNoMoreInteractions(whitelistPersistor);
   }
 }

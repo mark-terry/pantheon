@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
         parameters.required(req.getParams(), 0, StringListParameter.class);
 
     try {
-      List<DefaultPeer> peers =
+      List<Peer> peers =
           enodeListParam
               .getStringList()
               .parallelStream()

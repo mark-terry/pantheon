@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,12 +63,12 @@ public class PermissioningConfigurationBuilder {
         List<String> accountsWhitelistToml =
             accountWhitelistTomlArray
                 .toList()
-                .stream()
+                .parallelStream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
         permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
       } else {
-        permissioningConfiguration.setAccountWhitelist(Collections.emptyList());
+        permissioningConfiguration.setAccountWhitelist(new ArrayList<>());
       }
     }
 
@@ -77,13 +77,13 @@ public class PermissioningConfigurationBuilder {
         List<URI> nodesWhitelistToml =
             nodeWhitelistTomlArray
                 .toList()
-                .stream()
+                .parallelStream()
                 .map(Object::toString)
                 .map(EnodeToURIPropertyConverter::convertToURI)
                 .collect(Collectors.toList());
         permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
       } else {
-        permissioningConfiguration.setNodeWhitelist(Collections.emptyList());
+        permissioningConfiguration.setNodeWhitelist(new ArrayList<>());
       }
     }
     return permissioningConfiguration;

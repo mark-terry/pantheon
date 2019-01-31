@@ -14,13 +14,20 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController.AddResult;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController.RemoveResult;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -162,5 +169,28 @@ public class AccountWhitelistControllerTest {
                 "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
 
     assertThat(removeResult).isEqualTo(RemoveResult.ERROR_DUPLICATED_ENTRY);
+  }
+
+  @Test
+  public void stateShouldRevertIfWhitelistPersistFails() throws IOException {
+    List<String> newAccount = singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
+    List<String> newAccount2 = singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd72");
+
+    assertThat(controller.isAccountWhiteListSet()).isFalse();
+    assertThat(controller.getAccountWhitelist().size()).isEqualTo(0);
+
+    controller.addAccounts(newAccount);
+    assertThat(controller.isAccountWhiteListSet()).isTrue();
+    assertThat(controller.getAccountWhitelist().size()).isEqualTo(1);
+
+    doThrow(new IOException()).when(whitelistPersistor).updateConfig(any(), any());
+    controller.addAccounts(newAccount2);
+
+    assertThat(controller.isAccountWhiteListSet()).isTrue();
+    assertThat(controller.getAccountWhitelist().size()).isEqualTo(1);
+    assertThat(controller.getAccountWhitelist()).isEqualTo(newAccount);
+
+    verify(whitelistPersistor, times(2)).updateConfig(any(), any());
+    verifyNoMoreInteractions(whitelistPersistor);
   }
 }

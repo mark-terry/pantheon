@@ -63,14 +63,14 @@ public class NodeWhitelistController {
     return nodesWhitelist.remove(node);
   }
 
-  public NodesWhitelistResult addNodes(final List<DefaultPeer> peers) {
+  public NodesWhitelistResult addNodes(final List<Peer> peers) {
     if (peerListHasDuplicates(peers)) {
       return new NodesWhitelistResult(
           NodesWhitelistResultType.ERROR_DUPLICATED_ENTRY,
           String.format("Specified peer list contains duplicates"));
     }
 
-    for (DefaultPeer peer : peers) {
+    for (Peer peer : peers) {
       if (nodesWhitelist.contains(peer)) {
         return new NodesWhitelistResult(
             NodesWhitelistResultType.ERROR_EXISTING_ENTRY,
@@ -92,18 +92,18 @@ public class NodeWhitelistController {
     return new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS);
   }
 
-  private boolean peerListHasDuplicates(final List<DefaultPeer> peers) {
+  private boolean peerListHasDuplicates(final List<Peer> peers) {
     return !peers.stream().allMatch(new HashSet<>()::add);
   }
 
-  public NodesWhitelistResult removeNodes(final List<DefaultPeer> peers) {
+  public NodesWhitelistResult removeNodes(final List<Peer> peers) {
     if (peerListHasDuplicates(peers)) {
       return new NodesWhitelistResult(
           NodesWhitelistResultType.ERROR_DUPLICATED_ENTRY,
           String.format("Specified peer list contains duplicates"));
     }
 
-    for (DefaultPeer peer : peers) {
+    for (Peer peer : peers) {
       if (!(nodesWhitelist.contains(peer))) {
         return new NodesWhitelistResult(
             NodesWhitelistResultType.ERROR_ABSENT_ENTRY,
