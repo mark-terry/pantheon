@@ -35,10 +35,19 @@ public class NodeWhitelistController {
   private final WhitelistPersistor whitelistPersistor;
   private final String WHITELIST_FAIL_MESSAGE = "Unable to update whitelist configuration file.";
 
-  public NodeWhitelistController(final PermissioningConfiguration configuration) {
-    this.whitelistPersistor = new WhitelistPersistor(configuration.getConfigurationFilePath());
-    if (configuration.isNodeWhitelistSet() && configuration.getNodeWhitelist() != null) {
-      for (URI uri : configuration.getNodeWhitelist()) {
+  public NodeWhitelistController(final PermissioningConfiguration permissioningConfiguration) {
+    this(
+        permissioningConfiguration,
+        new WhitelistPersistor(permissioningConfiguration.getConfigurationFilePath()));
+  }
+
+  public NodeWhitelistController(
+      final PermissioningConfiguration permissioningConfiguration,
+      final WhitelistPersistor whitelistPersistor) {
+    this.whitelistPersistor = whitelistPersistor;
+    if (permissioningConfiguration.isNodeWhitelistSet()
+        && permissioningConfiguration.getNodeWhitelist() != null) {
+      for (URI uri : permissioningConfiguration.getNodeWhitelist()) {
         nodesWhitelist.add(DefaultPeer.fromURI(uri));
       }
       nodeWhitelistSet = true;

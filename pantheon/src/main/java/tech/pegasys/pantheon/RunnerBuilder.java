@@ -54,6 +54,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -214,8 +215,11 @@ public class RunnerBuilder {
         new PeerBlacklist(
             bannedNodeIds.stream().map(BytesValue::fromHexString).collect(Collectors.toSet()));
 
+    final WhitelistPersistor whitelistPersistor =
+        new WhitelistPersistor(permissioningConfiguration.getConfigurationFilePath());
+
     final NodeWhitelistController nodeWhitelistController =
-        new NodeWhitelistController(permissioningConfiguration);
+        new NodeWhitelistController(permissioningConfiguration, whitelistPersistor);
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
 
@@ -242,7 +246,7 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
     final AccountWhitelistController accountWhitelistController =
-        new AccountWhitelistController(permissioningConfiguration);
+        new AccountWhitelistController(permissioningConfiguration, whitelistPersistor);
     if (permissioningConfiguration.isAccountWhitelistSet()) {
       transactionPool.setAccountWhitelist(accountWhitelistController);
     }

@@ -47,7 +47,7 @@ public class WhitelistPersistor {
     this.configurationFile = new File(configurationFile);
   }
 
-  public void updateConfig(
+  public synchronized void updateConfig(
       final WHITELIST_TYPE whitelistType, final Collection<String> updatedWhitelistValues)
       throws IOException {
     removeExistingConfigItem(whitelistType);
@@ -57,9 +57,9 @@ public class WhitelistPersistor {
   @VisibleForTesting
   public void removeExistingConfigItem(final WHITELIST_TYPE whitelistType) throws IOException {
     List<String> otherConfigItems;
-    try (Stream<String> stream = Files.lines(configurationFile.toPath())) {
+    try (Stream<String> configKeys = Files.lines(configurationFile.toPath())) {
       otherConfigItems =
-          stream
+          configKeys
               .filter(line -> !line.contains(whitelistType.getTomlKey()))
               .collect(Collectors.toList());
     }
