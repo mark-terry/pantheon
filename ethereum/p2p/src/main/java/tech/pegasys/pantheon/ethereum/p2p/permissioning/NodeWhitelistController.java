@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class NodeWhitelistController {
 
-  private final List<Peer> nodesWhitelist = new ArrayList<>();
+  private List<Peer> nodesWhitelist = new ArrayList<>();
   private boolean nodeWhitelistSet = false;
   private final WhitelistPersistor whitelistPersistor;
   private final String WHITELIST_FAIL_MESSAGE = "Unable to update whitelist configuration file.";

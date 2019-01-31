@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
