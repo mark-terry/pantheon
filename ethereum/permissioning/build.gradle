@@ -27,6 +27,7 @@ jar {
 
 dependencies {
   implementation project(':util')
+  implementation 'com.google.guava:guava'
 
   testImplementation 'junit:junit'
   testImplementation 'org.assertj:assertj-core'

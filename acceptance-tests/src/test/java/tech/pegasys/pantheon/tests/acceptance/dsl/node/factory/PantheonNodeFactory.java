@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -177,6 +178,8 @@ public class PantheonNodeFactory {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+    permissioningConfiguration.setConfigurationFilePath(
+        createTempPermissioningConfigurationFile().getPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
@@ -191,6 +194,8 @@ public class PantheonNodeFactory {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+    permissioningConfiguration.setConfigurationFilePath(
+        createTempPermissioningConfigurationFile().getPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
@@ -199,6 +204,12 @@ public class PantheonNodeFactory {
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
+  }
+
+  private File createTempPermissioningConfigurationFile() throws IOException {
+    File tempFile = File.createTempFile("temp", "temp");
+    tempFile.deleteOnExit();
+    return tempFile;
   }
 
   public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {

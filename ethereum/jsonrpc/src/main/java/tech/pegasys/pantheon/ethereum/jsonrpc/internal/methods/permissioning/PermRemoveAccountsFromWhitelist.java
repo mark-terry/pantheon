@@ -63,6 +63,8 @@ public class PermRemoveAccountsFromWhitelist implements JsonRpcMethod {
         case ERROR_DUPLICATED_ENTRY:
           return new JsonRpcErrorResponse(
               request.getId(), JsonRpcError.ACCOUNT_WHITELIST_DUPLICATED_ENTRY);
+        case ERROR_WHITELIST_PERSIST_FAIL:
+          return new JsonRpcErrorResponse(request.getId(), JsonRpcError.WHITELIST_PERSIST_FAILURE);
         case SUCCESS:
           return new JsonRpcSuccessResponse(request.getId());
         default:

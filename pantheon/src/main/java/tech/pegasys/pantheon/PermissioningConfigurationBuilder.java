@@ -70,7 +70,9 @@ public class PermissioningConfigurationBuilder {
     if (permissionedAccountEnabled) {
       if (accountWhitelistTomlArray != null) {
         List<String> accountsWhitelistToml =
-            accountWhitelistTomlArray.toList().stream()
+            accountWhitelistTomlArray
+                .toList()
+                .parallelStream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
         permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
@@ -79,10 +81,13 @@ public class PermissioningConfigurationBuilder {
             ACCOUNTS_WHITELIST + " config option missing in TOML config file " + configFilePath);
       }
     }
+
     if (permissionedNodeEnabled) {
       if (nodeWhitelistTomlArray != null) {
         List<URI> nodesWhitelistToml =
-            nodeWhitelistTomlArray.toList().stream()
+            nodeWhitelistTomlArray
+                .toList()
+                .parallelStream()
                 .map(Object::toString)
                 .map(EnodeToURIPropertyConverter::convertToURI)
                 .collect(Collectors.toList());

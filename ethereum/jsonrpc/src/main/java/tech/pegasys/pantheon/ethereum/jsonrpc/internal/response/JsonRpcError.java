@@ -49,7 +49,7 @@ public enum JsonRpcError {
   // Wallet errors
   COINBASE_NOT_SPECIFIED(-32000, "Coinbase must be explicitly specified"),
 
-  // Permissioning errors
+  // Account whitelist errors
   ACCOUNT_WHITELIST_NOT_ENABLED(-32000, "Account whitelisting has not been enabled"),
   ACCOUNT_WHITELIST_EMPTY_ENTRY(-32000, "Request contains an empty list of accounts"),
   ACCOUNT_WHITELIST_INVALID_ENTRY(-32000, "Request contains an invalid account"),
@@ -65,6 +65,11 @@ public enum JsonRpcError {
   NODE_WHITELIST_EXISTING_ENTRY(-32000, "Cannot add an existing node to whitelist"),
   NODE_WHITELIST_MISSING_ENTRY(-32000, "Cannot remove an absent node from whitelist"),
 
+  // Permissioning errors
+  WHITELIST_PERSIST_FAILURE(
+      -32000, "Unable to persist changes to whitelist configuration file. Changes reverted."),
+
+  // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");
 
   private final int code;
