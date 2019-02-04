@@ -19,8 +19,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetExpectedAcco
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetNodesWhitelistPopulated;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsFromWhitelistSuccessfully;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveNodeSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.WhiteListContainsKeyAndValue;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,5 +58,9 @@ public class Perm {
 
   public Condition getNodesWhitelist(final int expectedNodeNum) {
     return new GetNodesWhitelistPopulated(transactions.getNodesWhiteList(), expectedNodeNum);
+  }
+
+  public Condition expectPermissioningWhitelistFileKeyValue(final String val, final Path tempFile) {
+    return new WhiteListContainsKeyAndValue(val, tempFile);
   }
 }

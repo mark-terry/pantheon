@@ -53,7 +53,7 @@ public class AccountWhitelistController {
     final List<String> oldWhitelist = new ArrayList<>(this.accountWhitelist);
     this.accountWhitelist.addAll(accounts);
     try {
-      updateConfigurationFile(accounts);
+      updateConfigurationFile(accountWhitelist);
     } catch (IOException e) {
       revertState(oldWhitelist);
       return WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL;
@@ -75,7 +75,7 @@ public class AccountWhitelistController {
 
     this.accountWhitelist.removeAll(accounts);
     try {
-      updateConfigurationFile(accounts);
+      updateConfigurationFile(accountWhitelist);
     } catch (IOException e) {
       revertState(oldWhitelist);
       return WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL;

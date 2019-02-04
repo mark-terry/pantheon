@@ -173,6 +173,26 @@ public class PantheonNodeFactory {
             .build());
   }
 
+  public PantheonNode createNodeWithWhitelistsEnabled(
+      final String name,
+      final List<URI> nodesWhitelist,
+      final List<String> accountsWhitelist,
+      final String tempFilePath)
+      throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+    permissioningConfiguration.setConfigurationFilePath(tempFilePath);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
   public PantheonNode createNodeWithNodesWhitelist(
       final String name, final List<URI> nodesWhitelist) throws IOException {
     PermissioningConfiguration permissioningConfiguration =
