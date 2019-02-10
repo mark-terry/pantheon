@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddAccountsToWhitelistSuccessfully;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddNodeSuccess;
@@ -24,6 +25,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class Perm {
@@ -60,7 +62,10 @@ public class Perm {
     return new GetNodesWhitelistPopulated(transactions.getNodesWhiteList(), expectedNodeNum);
   }
 
-  public Condition expectPermissioningWhitelistFileKeyValue(final String val, final Path tempFile) {
-    return new WhiteListContainsKeyAndValue(val, tempFile);
+  public Condition expectPermissioningWhitelistFileKeyValue(
+      final WhitelistPersistor.WHITELIST_TYPE whitelistType,
+      final Collection<String> val,
+      final Path configFilePath) {
+    return new WhiteListContainsKeyAndValue(whitelistType, val, configFilePath);
   }
 }

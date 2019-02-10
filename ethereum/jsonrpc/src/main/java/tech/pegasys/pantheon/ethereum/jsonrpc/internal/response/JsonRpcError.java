@@ -67,7 +67,10 @@ public enum JsonRpcError {
 
   // Permissioning errors
   WHITELIST_PERSIST_FAILURE(
-      -32000, "Unable to persist changes to whitelist configuration file. Changes reverted."),
+      -32000, "Unable to persist changes to whitelist configuration file. Changes reverted"),
+  WHITELIST_FILE_SYNC(
+      -32000,
+      "The permissioning whitelist configuration file is out of sync.  The changes have been applied, but not persisted to disk"),
 
   // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");

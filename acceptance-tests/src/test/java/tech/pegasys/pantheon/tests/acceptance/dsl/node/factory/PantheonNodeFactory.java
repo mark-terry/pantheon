@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
@@ -36,12 +37,14 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.io.Resources;
 
@@ -198,8 +201,12 @@ public class PantheonNodeFactory {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-    permissioningConfiguration.setConfigurationFilePath(
-        createTempPermissioningConfigurationFile().getPath());
+    File tempFile = createTempPermissioningConfigurationFile();
+    permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
+    initPermissioningConfigurationFile(
+        WhitelistPersistor.WHITELIST_TYPE.NODES,
+        nodesWhitelist.parallelStream().map(URI::toString).collect(Collectors.toList()),
+        tempFile.toPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
@@ -207,6 +214,14 @@ public class PantheonNodeFactory {
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
+  }
+
+  private void initPermissioningConfigurationFile(
+      final WhitelistPersistor.WHITELIST_TYPE listType,
+      final Collection<String> whitelistVal,
+      final Path configFilePath)
+      throws IOException {
+    WhitelistPersistor.addNewConfigItem(listType, whitelistVal, configFilePath);
   }
 
   public PantheonNode createNodeWithAccountsWhitelist(

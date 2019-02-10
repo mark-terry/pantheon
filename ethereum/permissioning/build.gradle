@@ -28,6 +28,7 @@ jar {
 dependencies {
   implementation project(':util')
   implementation 'com.google.guava:guava'
+  implementation 'net.consensys.cava:cava-toml'
 
   testImplementation 'junit:junit'
   testImplementation 'org.assertj:assertj-core'

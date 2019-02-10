@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistFileSyncException;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 
@@ -33,7 +34,6 @@ public class NodeWhitelistController {
 
   private List<Peer> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
-  private final String WHITELIST_FAIL_MESSAGE = "Unable to update whitelist configuration file.";
 
   public NodeWhitelistController(final PermissioningConfiguration permissioningConfiguration) {
     this(
@@ -77,11 +77,14 @@ public class NodeWhitelistController {
 
     peers.forEach(this::addNode);
     try {
+      verifyConfigurationFileState(peerToEnodeURI(oldWhitelist));
       updateConfigurationFile(peerToEnodeURI(nodesWhitelist));
+      verifyConfigurationFileState(peerToEnodeURI(nodesWhitelist));
     } catch (IOException e) {
       revertState(oldWhitelist);
-      return new NodesWhitelistResult(
-          WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL, WHITELIST_FAIL_MESSAGE);
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL);
+    } catch (WhitelistFileSyncException e) {
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_WHITELIST_FILE_SYNC);
     }
     return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
   }
@@ -108,11 +111,14 @@ public class NodeWhitelistController {
 
     peers.forEach(this::removeNode);
     try {
+      verifyConfigurationFileState(peerToEnodeURI(oldWhitelist));
       updateConfigurationFile(peerToEnodeURI(nodesWhitelist));
+      verifyConfigurationFileState(peerToEnodeURI(nodesWhitelist));
     } catch (IOException e) {
       revertState(oldWhitelist);
-      return new NodesWhitelistResult(
-          WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL, WHITELIST_FAIL_MESSAGE);
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL);
+    } catch (WhitelistFileSyncException e) {
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_WHITELIST_FILE_SYNC);
     }
     return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
   }
@@ -130,6 +136,12 @@ public class NodeWhitelistController {
     }
 
     return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
+  }
+
+  private void verifyConfigurationFileState(final Collection<String> oldNodes)
+      throws IOException, WhitelistFileSyncException {
+    whitelistPersistor.verifyConfigFileMatchesState(
+        WhitelistPersistor.WHITELIST_TYPE.NODES, oldNodes);
   }
 
   private void updateConfigurationFile(final Collection<String> nodes) throws IOException {

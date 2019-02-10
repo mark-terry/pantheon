@@ -15,14 +15,20 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import net.consensys.cava.toml.Toml;
+import net.consensys.cava.toml.TomlParseResult;
 
 public class WhitelistPersistor {
 
@@ -47,6 +53,26 @@ public class WhitelistPersistor {
     this.configurationFile = new File(configurationFile);
   }
 
+  public static boolean verifyConfigFileMatchesState(
+      final WHITELIST_TYPE whitelistType,
+      final Collection<String> checkLists,
+      final Path configurationFilePath)
+      throws IOException, WhitelistFileSyncException {
+    boolean listsMatch =
+        new HashSet<>(existingConfigItems(configurationFilePath).get(whitelistType))
+            .equals(new HashSet<>(checkLists));
+    if (!listsMatch) {
+      throw new WhitelistFileSyncException();
+    }
+    return listsMatch;
+  }
+
+  public boolean verifyConfigFileMatchesState(
+      final WHITELIST_TYPE whitelistType, final Collection<String> checkLists)
+      throws IOException, WhitelistFileSyncException {
+    return verifyConfigFileMatchesState(whitelistType, checkLists, configurationFile.toPath());
+  }
+
   public synchronized void updateConfig(
       final WHITELIST_TYPE whitelistType, final Collection<String> updatedWhitelistValues)
       throws IOException {
@@ -54,15 +80,35 @@ public class WhitelistPersistor {
     addNewConfigItem(whitelistType, updatedWhitelistValues);
   }
 
+  private static Map<WHITELIST_TYPE, Collection<String>> existingConfigItems(
+      final Path configurationFilePath) throws IOException {
+    TomlParseResult parsedToml = Toml.parse(configurationFilePath);
+
+    return Arrays.stream(WHITELIST_TYPE.values())
+        .map(
+            whitelist_type ->
+                new AbstractMap.SimpleImmutableEntry<>(
+                    whitelist_type, parsedToml.getArrayOrEmpty(whitelist_type.getTomlKey())))
+        .collect(
+            Collectors.toMap(
+                o -> o.getKey(),
+                o ->
+                    o.getValue()
+                        .toList()
+                        .stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList())));
+  }
+
   @VisibleForTesting
-  public void removeExistingConfigItem(final WHITELIST_TYPE whitelistType) throws IOException {
-    List<String> otherConfigItems;
-    try (Stream<String> configKeys = Files.lines(configurationFile.toPath())) {
-      otherConfigItems =
-          configKeys
-              .filter(line -> !line.contains(whitelistType.getTomlKey()))
-              .collect(Collectors.toList());
-    }
+  void removeExistingConfigItem(final WHITELIST_TYPE whitelistType) throws IOException {
+    List<String> otherConfigItems =
+        existingConfigItems(configurationFile.toPath())
+            .entrySet()
+            .parallelStream()
+            .filter(listType -> !listType.getKey().equals(whitelistType))
+            .map(keyVal -> valueListToTomlArray(keyVal.getKey(), keyVal.getValue()))
+            .collect(Collectors.toList());
 
     Files.write(
         configurationFile.toPath(),
@@ -72,22 +118,35 @@ public class WhitelistPersistor {
   }
 
   @VisibleForTesting
-  public void addNewConfigItem(
-      final WHITELIST_TYPE whitelistType, final Collection<String> whitelistValues)
+  public static void addNewConfigItem(
+      final WHITELIST_TYPE whitelistType,
+      final Collection<String> whitelistValues,
+      final Path configFilePath)
       throws IOException {
-    String newConfigItem =
-        String.format(
-            "%s=[%s]",
-            whitelistType.getTomlKey(),
-            whitelistValues
-                .parallelStream()
-                .map(uri -> String.format("\"%s\"", uri))
-                .collect(Collectors.joining(",")));
+    String newConfigItem = valueListToTomlArray(whitelistType, whitelistValues);
 
     Files.write(
-        configurationFile.toPath(),
+        configFilePath,
         newConfigItem.getBytes(Charsets.UTF_8),
         StandardOpenOption.WRITE,
         StandardOpenOption.APPEND);
+  }
+
+  @VisibleForTesting
+  void addNewConfigItem(
+      final WHITELIST_TYPE whitelistType, final Collection<String> whitelistValues)
+      throws IOException {
+    addNewConfigItem(whitelistType, whitelistValues, configurationFile.toPath());
+  }
+
+  private static String valueListToTomlArray(
+      final WHITELIST_TYPE whitelistType, final Collection<String> whitelistValues) {
+    return String.format(
+        "%s=[%s]",
+        whitelistType.getTomlKey(),
+        whitelistValues
+            .parallelStream()
+            .map(uri -> String.format("\"%s\"", uri))
+            .collect(Collectors.joining(",")));
   }
 }

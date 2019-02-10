@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
+import static tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
@@ -57,28 +59,27 @@ public class WhitelistPersistorAcceptanceTest extends AcceptanceTestBase {
   public void manipulatedAccountsWhitelistIsPersisted() {
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[\"%s\"]", "accounts-whitelist", senderA.getAddress()), tempFile));
+            WHITELIST_TYPE.ACCOUNTS, Collections.singleton(senderA.getAddress()), tempFile));
 
     node.execute(transactions.addAccountsToWhitelist(senderB.getAddress()));
     node.verify(perm.expectAccountsWhitelist(senderA.getAddress(), senderB.getAddress()));
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format(
-                "%s=[\"%s\",\"%s\"]",
-                "accounts-whitelist", senderA.getAddress(), senderB.getAddress()),
+            WHITELIST_TYPE.ACCOUNTS,
+            Lists.list(senderA.getAddress(), senderB.getAddress()),
             tempFile));
 
     node.execute(transactions.removeAccountsFromWhitelist(senderB.getAddress()));
     node.verify(perm.expectAccountsWhitelist(senderA.getAddress()));
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[\"%s\"]", "accounts-whitelist", senderA.getAddress()), tempFile));
+            WHITELIST_TYPE.ACCOUNTS, Collections.singleton(senderA.getAddress()), tempFile));
 
     node.execute(transactions.removeAccountsFromWhitelist(senderA.getAddress()));
     node.verify(perm.expectAccountsWhitelist());
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[]", "accounts-whitelist"), tempFile));
+            WHITELIST_TYPE.ACCOUNTS, Collections.emptyList(), tempFile));
   }
 
   @Test
@@ -86,17 +87,16 @@ public class WhitelistPersistorAcceptanceTest extends AcceptanceTestBase {
     node.verify(perm.addNodesToWhitelist(Lists.newArrayList(enode1, enode2)));
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[\"%s\",\"%s\"]", "nodes-whitelist", enode1, enode2), tempFile));
+            WHITELIST_TYPE.NODES, Lists.newArrayList(enode1, enode2), tempFile));
 
     node.verify(perm.removeNodesFromWhitelist(Lists.newArrayList(enode1)));
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[\"%s\"]", "nodes-whitelist", enode2), tempFile));
+            WHITELIST_TYPE.NODES, Collections.singleton(enode2), tempFile));
 
     node.verify(perm.addNodesToWhitelist(Lists.newArrayList(enode1, enode3)));
     node.verify(
         perm.expectPermissioningWhitelistFileKeyValue(
-            String.format("%s=[\"%s\",\"%s\",\"%s\"]", "nodes-whitelist", enode2, enode1, enode3),
-            tempFile));
+            WHITELIST_TYPE.NODES, Lists.newArrayList(enode2, enode1, enode3), tempFile));
   }
 }

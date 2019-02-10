@@ -158,7 +158,8 @@ public class AccountWhitelistControllerTest {
   }
 
   @Test
-  public void stateShouldRevertIfWhitelistPersistFails() throws IOException {
+  public void stateShouldRevertIfWhitelistPersistFails()
+      throws IOException, WhitelistFileSyncException {
     List<String> newAccount = singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
     List<String> newAccount2 = singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd72");
 
@@ -173,6 +174,7 @@ public class AccountWhitelistControllerTest {
     assertThat(controller.getAccountWhitelist().size()).isEqualTo(1);
     assertThat(controller.getAccountWhitelist()).isEqualTo(newAccount);
 
+    verify(whitelistPersistor, times(3)).verifyConfigFileMatchesState(any(), any());
     verify(whitelistPersistor, times(2)).updateConfig(any(), any());
     verifyNoMoreInteractions(whitelistPersistor);
   }

@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -53,10 +54,14 @@ public class AccountWhitelistController {
     final List<String> oldWhitelist = new ArrayList<>(this.accountWhitelist);
     this.accountWhitelist.addAll(accounts);
     try {
+      verifyConfigurationFileState(oldWhitelist);
       updateConfigurationFile(accountWhitelist);
+      verifyConfigurationFileState(accountWhitelist);
     } catch (IOException e) {
       revertState(oldWhitelist);
       return WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL;
+    } catch (WhitelistFileSyncException e) {
+      return WhitelistOperationResult.ERROR_WHITELIST_FILE_SYNC;
     }
     return WhitelistOperationResult.SUCCESS;
   }
@@ -75,10 +80,14 @@ public class AccountWhitelistController {
 
     this.accountWhitelist.removeAll(accounts);
     try {
+      verifyConfigurationFileState(oldWhitelist);
       updateConfigurationFile(accountWhitelist);
+      verifyConfigurationFileState(accountWhitelist);
     } catch (IOException e) {
       revertState(oldWhitelist);
       return WhitelistOperationResult.ERROR_WHITELIST_PERSIST_FAIL;
+    } catch (WhitelistFileSyncException e) {
+      return WhitelistOperationResult.ERROR_WHITELIST_FILE_SYNC;
     }
     return WhitelistOperationResult.SUCCESS;
   }
@@ -99,7 +108,13 @@ public class AccountWhitelistController {
     return WhitelistOperationResult.SUCCESS;
   }
 
-  private void updateConfigurationFile(final List<String> accounts) throws IOException {
+  private void verifyConfigurationFileState(final Collection<String> oldAccounts)
+      throws IOException, WhitelistFileSyncException {
+    whitelistPersistor.verifyConfigFileMatchesState(
+        WhitelistPersistor.WHITELIST_TYPE.ACCOUNTS, oldAccounts);
+  }
+
+  private void updateConfigurationFile(final Collection<String> accounts) throws IOException {
     whitelistPersistor.updateConfig(WhitelistPersistor.WHITELIST_TYPE.ACCOUNTS, accounts);
   }
 

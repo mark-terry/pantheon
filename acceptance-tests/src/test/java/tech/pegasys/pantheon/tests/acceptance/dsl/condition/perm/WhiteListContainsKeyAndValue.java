@@ -14,29 +14,35 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
+import java.util.Collection;
 
 public class WhiteListContainsKeyAndValue implements Condition {
-  private final String val;
-  private final Path tempFile;
+  private final WhitelistPersistor.WHITELIST_TYPE whitelistType;
+  private final Collection<String> whitelistValues;
+  private final Path configFilePath;
 
-  public WhiteListContainsKeyAndValue(final String val, final Path tempFile) {
-    this.val = val;
-    this.tempFile = tempFile;
+  public WhiteListContainsKeyAndValue(
+      final WhitelistPersistor.WHITELIST_TYPE whitelistType,
+      final Collection<String> whitelistValues,
+      final Path configFilePath) {
+    this.whitelistType = whitelistType;
+    this.whitelistValues = whitelistValues;
+    this.configFilePath = configFilePath;
   }
 
   @Override
   public void verify(final Node node) {
-    Boolean result;
-    try (Stream<String> lines = Files.lines(tempFile)) {
-      result = lines.anyMatch(line -> line.equals(val));
-    } catch (IOException e) {
+    boolean result;
+    try {
+      result =
+          WhitelistPersistor.verifyConfigFileMatchesState(
+              whitelistType, whitelistValues, configFilePath);
+    } catch (final Exception e) {
       result = false;
     }
     assertThat(result).isTrue();

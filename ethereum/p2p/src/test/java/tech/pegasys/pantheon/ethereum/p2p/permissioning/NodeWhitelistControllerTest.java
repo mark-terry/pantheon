@@ -24,6 +24,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistCont
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistFileSyncException;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
@@ -244,7 +245,8 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
-  public void stateShouldRevertIfWhitelistPersistFails() throws IOException {
+  public void stateShouldRevertIfWhitelistPersistFails()
+      throws IOException, WhitelistFileSyncException {
     List<Peer> newNode1 = singletonList(DefaultPeer.fromURI(enode1));
     List<Peer> newNode2 = singletonList(DefaultPeer.fromURI(enode2));
 
@@ -259,6 +261,7 @@ public class NodeWhitelistControllerTest {
     assertThat(controller.getNodesWhitelist().size()).isEqualTo(1);
     assertThat(controller.getNodesWhitelist()).isEqualTo(newNode1);
 
+    verify(whitelistPersistor, times(3)).verifyConfigFileMatchesState(any(), any());
     verify(whitelistPersistor, times(2)).updateConfig(any(), any());
     verifyNoMoreInteractions(whitelistPersistor);
   }
