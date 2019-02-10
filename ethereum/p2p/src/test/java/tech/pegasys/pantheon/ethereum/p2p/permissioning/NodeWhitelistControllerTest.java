@@ -26,8 +26,8 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistFileSyncException;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
 import java.util.ArrayList;

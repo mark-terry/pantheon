@@ -95,7 +95,7 @@ public class WhitelistPersistor {
                 o ->
                     o.getValue()
                         .toList()
-                        .stream()
+                        .parallelStream()
                         .map(Object::toString)
                         .collect(Collectors.toList())));
   }
