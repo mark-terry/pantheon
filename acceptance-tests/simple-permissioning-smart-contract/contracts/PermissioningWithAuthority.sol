@@ -2,7 +2,8 @@ pragma solidity >=0.4.0 <0.6.0;
 // THIS CONTRACT IS FOR TESTING PURPOSES ONLY
 // DO NOT USE THIS CONTRACT IN PRODUCTION APPLICATIONS
 
-contract PermissioningWithAuthority {    // These will be assigned at the construction
+contract PermissioningWithAuthority {
+    // These will be assigned at the construction
     // phase, where `msg.sender` is the account
     // creating this contract.
     address public admin = msg.sender;
@@ -83,7 +84,7 @@ modifier onlyBy(address _account)
         EnodeIpv6 memory zeros = EnodeIpv6(bytes32(0), bytes32(0), bytes16(0), 0);
         whitelistIpv6[key] = zeros;
     }
-    function removeEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public {
+    function removeEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public onlyBy(admin) {
         bytes memory key = computeKeyIpv4(enodeHigh, enodeLow, enodeIpv4, enodePort);
         EnodeIpv4 memory zeros = EnodeIpv4(bytes32(0), bytes32(0), bytes4(0), 0);
         whitelistIpv4[key] = zeros;
