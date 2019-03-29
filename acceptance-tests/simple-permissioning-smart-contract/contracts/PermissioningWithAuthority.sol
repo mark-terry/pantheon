@@ -32,6 +32,8 @@ contract PermissioningWithAuthority {
     mapping(bytes => EnodeIpv4) private whitelistIpv4; 
 
     // keys
+    uint countIpv4;
+    uint countIpv6;
     bytes[] keysIpv4;
     bytes[] keysIpv6;
 
@@ -86,7 +88,7 @@ contract PermissioningWithAuthority {
         }
     }
     return ret;
-}
+    }
 
     // READ ONLY MODE
     function isReadOnly() public view returns (bool) {
@@ -149,6 +151,8 @@ contract PermissioningWithAuthority {
         }
         whitelistIpv6[key] = newEnode;
         keysIpv6.push(key);
+        countIpv6 = countIpv6 + 1;
+        return true;
     }
     function addEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public onlyAdmin returns (bool) {
         require(readOnlyMode == false);
@@ -160,6 +164,7 @@ contract PermissioningWithAuthority {
         }
         whitelistIpv4[key] = newEnode;
         keysIpv4.push(key);
+        countIpv4 = countIpv4 + 1;
         return true;
     }
 
@@ -170,8 +175,10 @@ contract PermissioningWithAuthority {
         if (enodeExists(whitelistIpv6[key])) {
             return false;
         }
+        countIpv6 = countIpv6 - 1;
         // TODO does this work?
         delete whitelistIpv6[key];
+        return true;
     }
     function removeEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public onlyAdmin returns (bool) {
         require(readOnlyMode == false);
@@ -180,11 +187,51 @@ contract PermissioningWithAuthority {
         if (whitelistIpv4[key].enodeHigh == 0) {
             return false;
         }
+        countIpv4 = countIpv4 - 1;
         delete whitelistIpv4[key];
         return true;
     }
 
+    // return list of enodes
+    // TODO so far just enodeHigh ie bytes32[]
+    function getAllEnodeHighsIpv4() public view returns (bytes32[] memory){
+    bytes32[] memory ret = new bytes32[](countIpv4);
+    EnodeIpv4 memory a;
+    for (uint i = 0; i < keysIpv4.length; i++) {
+        a = whitelistIpv4[keysIpv4[i]];
+        if (enodeExists(a)) {
+            ret[i] = whitelistIpv4[keysIpv4[i]].enodeHigh;
+        }
+    }
+    return ret;
+    }
+
     // RULES - UTILS
+    function enodeBytes(EnodeIpv4 memory enode) private pure returns (bytes memory) {
+        return enodeBytes(enode.enodeHigh, enode.enodeLow, enode.enodeHost, enode.enodePort);
+    }
+    function enodeBytes(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeHost, uint16 enodePort) public pure returns (bytes memory) {
+        // TODO 32 + 32 + 4 + uint16 port
+        uint16 enodeLength = 72;
+        bytes memory ret = new bytes(enodeLength);
+        for (uint i=0; i < 32; i++) {
+            ret[i] = enodeHigh[i];
+        }
+        for (uint i=0; i < 32; i++) {
+            ret[32 + i] = enodeLow[i];
+        }
+        for (uint i=0; i < 4; i++) {
+            ret[64 + i] = enodeHost[i];
+        }
+        // TODO don't need 32 bytes here
+        // use last 4 bytes but is that too many?
+        bytes32 portBytes = bytes32(uint256(enodePort));
+        for (uint i=0; i < 4; i++) {
+            ret[68 + i] = portBytes[i+28];
+        }
+        return ret;
+    }
+
     function enodeExists(EnodeIpv4 memory enode) private pure returns (bool) {
         // TODO do we need to check all fields?
         return enode.enodeHost > 0 && enode.enodeHigh > 0 && enode.enodeLow > 0;
