@@ -8,7 +8,13 @@ contract PermissioningWithAuthority {
     // creating this contract.
     address public admin = msg.sender;
     bool readOnlyMode = false;
-    mapping(bytes => address) admins;
+    struct Admin {
+        address adminAddress;
+        bool active;
+    }
+    mapping(address => Admin) admins;
+    uint adminCount;
+    address[] adminKeys;
 
     struct EnodeIpv6 {
         bytes32 enodeHigh;
@@ -33,32 +39,54 @@ contract PermissioningWithAuthority {
     // AUTHORIZATION
     constructor () public {
         // add the deploying contract address as first admin
-        admins[abi.encode(msg.sender)] = msg.sender;
+        Admin memory orig = Admin(msg.sender, true);
+        admins[msg.sender] = orig;
+        adminKeys.push(msg.sender);
+        adminCount = adminCount + 1;
     }
 
     // AUTHORIZATION: LIST OF ADMINS
     modifier onlyAdmin() 
     {
         require(
-            admins[abi.encode(msg.sender)] != address(0),
+            admins[msg.sender].adminAddress != address(0),
          "Sender not authorized."
         ); 
         _;
     }
 
     function isAuthorized(address source) public view returns (bool) {
-        return admins[abi.encode(source)] != address(0);
+        return admins[source].active;
     }
 
-    function addAdmin(address newAdmin) public onlyAdmin returns (bool) {
-        admins[abi.encode(newAdmin)] = newAdmin;
+    function addAdmin(address _newAdmin) public onlyAdmin returns (bool) {
+        if (admins[_newAdmin].active) {
+            return false;
+        }
+        adminKeys.push(_newAdmin); 
+        Admin memory newAdmin = Admin(_newAdmin, true);
+        admins[_newAdmin] = newAdmin;
+        adminCount = adminCount + 1;
         return true;
     }
 
     function removeAdmin(address oldAdmin) public onlyAdmin returns (bool) {
-        admins[abi.encode(oldAdmin)] = address(0);
+        admins[oldAdmin].active = false;
+        adminCount = adminCount - 1;
         return true;
     }
+    // return list of admins
+    function getAllAdmins() public view returns (address[] memory){
+    address[] memory ret = new address[](adminCount);
+    Admin memory a;
+    for (uint i = 0; i < adminKeys.length; i++) {
+        a = admins[adminKeys[i]];
+        if (a.active) {
+            ret[i] = admins[adminKeys[i]].adminAddress;
+        }
+    }
+    return ret;
+}
 
     // READ ONLY MODE
     function isReadOnly() public view returns (bool) {
