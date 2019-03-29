@@ -61,6 +61,10 @@ contract PermissioningWithAuthority {
     }
 
     // READ ONLY MODE
+    function isReadOnly() public view returns (bool) {
+        return readOnlyMode;
+    }
+
     function enterReadOnly() public onlyAdmin returns (bool) {
         require(readOnlyMode == false);
         readOnlyMode = true;
@@ -108,6 +112,7 @@ contract PermissioningWithAuthority {
 
     // RULES MODIFIERS - ADD
     function addEnodeIpv6(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv6, uint16 enodePort) public onlyAdmin returns (bool) {
+        require(readOnlyMode == false);
         EnodeIpv6 memory newEnode = EnodeIpv6(enodeHigh, enodeLow, enodeIpv6, enodePort);
         bytes memory key = computeKeyIpv6(enodeHigh, enodeLow, enodeIpv6, enodePort);
         // return false if already in the list
@@ -118,6 +123,7 @@ contract PermissioningWithAuthority {
         keysIpv6.push(key);
     }
     function addEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public onlyAdmin returns (bool) {
+        require(readOnlyMode == false);
         EnodeIpv4 memory newEnode = EnodeIpv4(enodeHigh, enodeLow, enodeIpv4, enodePort);
         bytes memory key = computeKeyIpv4(enodeHigh, enodeLow, enodeIpv4, enodePort);
         // return false if already in the list
@@ -131,6 +137,7 @@ contract PermissioningWithAuthority {
 
     // RULES MODIFIERS - REMOVE
     function removeEnodeIpv6(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv6, uint16 enodePort) public onlyAdmin returns (bool) {
+        require(readOnlyMode == false);
         bytes memory key = computeKeyIpv6(enodeHigh, enodeLow, enodeIpv6, enodePort);
         if (enodeExists(whitelistIpv6[key])) {
             return false;
@@ -139,6 +146,7 @@ contract PermissioningWithAuthority {
         delete whitelistIpv6[key];
     }
     function removeEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public onlyAdmin returns (bool) {
+        require(readOnlyMode == false);
         bytes memory key = computeKeyIpv4(enodeHigh, enodeLow, enodeIpv4, enodePort);
         // TODO is this enough to check?
         if (whitelistIpv4[key].enodeHigh == 0) {

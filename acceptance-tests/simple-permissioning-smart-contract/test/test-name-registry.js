@@ -7,8 +7,8 @@ var address1 = "0x0000000000000000000000000000000000001234";
 var name2 = "rules";
 var address2 = "0x0000000000000000000000000000000012345678";
 
-contract('Name Registry', () => {
-  describe('Function: register a name', () => {
+contract('Ingress', () => {
+  describe('Function: register a name and retrieve name', () => {
     
     it('What happens when I call getContractDetails for something not registered', async () => {
       proxy = await TestNameRegistry.new();

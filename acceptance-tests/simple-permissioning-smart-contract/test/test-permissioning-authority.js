@@ -1,10 +1,15 @@
 const TestPermissioning = artifacts.require('PermissioningWithAuthority.sol');
 var proxy;
 
+var node1High = "0x9bd359fdc3a2ed5df436c3d8914b1532740128929892092b7fcb320c1b62f375";
+var node1Low = "0x892092b7fcb320c1b62f3759bd359fdc3a2ed5df436c3d8914b1532740128929";
+var node1Host = "0x9bd359fd";
+var node1Port = 30303;
+
 var newAdmin = "f17f52151EbEF6C7334FAD080c5704D77216b732";
 
-contract('Permissioning WITH AUTHORITY ', () => {
-  describe('Function: Permissioning + Authority', () => {
+contract('Authority ', () => {
+  describe('Function: Authority checks', () => {
     it('add an admin and check if they are authorized', async () => {
       proxy = await TestPermissioning.new();
       let result = await proxy.addAdmin(newAdmin);
@@ -20,5 +25,32 @@ contract('Permissioning WITH AUTHORITY ', () => {
       assert.equal(result, false, 'expected disallowed since admin was removed');
     });
 
+    it('enter read only mode and expect add to fail', async () => {
+      await proxy.enterReadOnly();
+
+      // add node should fail in read only mode
+      try {
+        await proxy.addEnodeIpv4(node1High, node1Low, node1Host, node1Port);
+      } catch (err) {
+        assert(true, err.toString().includes('revert'), 'expected revert in message');
+         await proxy.exitReadOnly();
+        return;
+      }
+
+      assert(false, 'did not catch expected error ');
+    });
+
+    it('attempt to exit read only mode and expect to fail', async () => {
+
+      // exit read only mode should fail in normal mode
+      try {
+        await proxy.exitReadOnly();
+      } catch (err) {
+        assert(true, err.toString().includes('revert'), 'expected revert in message');
+        return;
+      }
+
+      assert(false, 'did not catch expected error ');
+    });
   });
 });
