@@ -1,0 +1,28 @@
+truffle migrate --network devwallet
+// note this will log the address of the deployed contract(s) - not needed for truffle console but that's the address you would set in the Ingress contract
+truffle console --network devwallet
+
+// Add A B C
+// this is messy but you could generate this output from a list of enodes
+// will log each tx to the console - could turn this off
+
+ SimplePermissioning.deployed().then(function(instance) {instance.addEnodeIpv4("0x8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3", "0xdcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77", "0x7f000001", 30301).then(function(tx) {console.log(tx)}); instance.addEnodeIpv4("0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)}); instance.addEnodeIpv4("0x8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3", "0xdcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77", "0x7f000001", 30301).then(function(tx) {console.log(tx)});});
+
+// allow C <> A ?
+ SimplePermissioning.deployed().then(function(instance) {instance.connectionAllowedIpv4("0x8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3", "0xdcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77", "0x7f000001", 30301,"0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)})});
+
+// expect true
+
+// Allow B <> C ?
+ SimplePermissioning.deployed().then(function(instance) {instance.connectionAllowedIpv4("0xabdc7dbe1959b1ecf3b5aa0332cb3cee9f3005203ddc27810a87b2fd43c6df88", "0x35717c680181dd02f4df7f1287ac0bb79d959fbab56e5c9c1db6b1338b4a6b54", "0x7f000001", 30302,"0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)})});
+
+// remove C
+SimplePermissioning.deployed().then(function(instance) {instance.removeEnodeIpv4("0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)})});
+
+// check if A <> C is allowed now: expect false
+
+// PermissioningWithAuthority
+PermissioningWithAuthority.deployed().then(function(instance) {instance.addEnodeIpv4("0x8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3", "0xdcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77", "0x7f000001", 30301).then(function(tx) {console.log(tx)}); instance.addEnodeIpv4("0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)}); instance.addEnodeIpv4("0x8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3", "0xdcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77", "0x7f000001", 30301).then(function(tx) {console.log(tx)});});
+
+// only admin can remove
+PermissioningWithAuthority.deployed().then(function(instance) {instance.removeEnodeIpv4("0x50a4fc842c16bb14977406b743fcde8d778fa8bb5a0516668fc29226f23ba7e1", "0x8820f2b4a8982d66a74048f7f1939f383f7d7cf3d6eab983ae73eebdeec4e12c", "0x7f000001", 30303).then(function(tx) {console.log(tx)})});
