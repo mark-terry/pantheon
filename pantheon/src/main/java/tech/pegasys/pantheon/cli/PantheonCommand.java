@@ -58,7 +58,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -884,7 +884,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
     final Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
-    final Optional<NodeSmartContractPermissioningConfiguration>
+    final Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
 
     if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
@@ -930,11 +930,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             this.commandLine,
             "No contract address specified. Cannot enable contract based permissions.");
       }
-      final NodeSmartContractPermissioningConfiguration nodeSmartContractPermissioningConfiguration =
+      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
           PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
               permissionsNodesContractAddress, permissionsNodesContractEnabled);
       smartContractPermissioningConfigurationOptional =
-          Optional.of(nodeSmartContractPermissioningConfiguration);
+          Optional.of(smartContractPermissioningConfiguration);
     } else {
       if (permissionsNodesContractAddress != null) {
         logger.warn(

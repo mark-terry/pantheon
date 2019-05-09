@@ -27,7 +27,8 @@ import java.io.IOException;
 
 import org.web3j.protocol.core.DefaultBlockParameterName;
 
-public class NodeSmartContractPermissioningNodeIsAllowedTransaction implements Transaction<Boolean> {
+public class NodeSmartContractPermissioningNodeIsAllowedTransaction
+    implements Transaction<Boolean> {
 
   private static final BytesValue IS_NODE_ALLOWED_SIGNATURE =
       tech.pegasys.pantheon.crypto.Hash.keccak256(

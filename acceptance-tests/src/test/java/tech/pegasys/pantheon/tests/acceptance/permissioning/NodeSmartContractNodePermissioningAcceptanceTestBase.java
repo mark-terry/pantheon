@@ -28,7 +28,8 @@ import java.io.IOException;
 class NodeSmartContractNodePermissioningAcceptanceTestBase extends AcceptanceTestBase {
 
   private final NodeSmartContractNodePermissioningTransactions smartContractNodePermissioning;
-  private final NodeSmartContractNodePermissioningConditions nodeSmartContractNodePermissioningConditions;
+  private final NodeSmartContractNodePermissioningConditions
+      nodeSmartContractNodePermissioningConditions;
 
   private static final String CONTRACT_ADDRESS = "0x0000000000000000000000000000000000009999";
   private static final String GENESIS_FILE = "/permissioning/simple_permissioning_genesis.json";

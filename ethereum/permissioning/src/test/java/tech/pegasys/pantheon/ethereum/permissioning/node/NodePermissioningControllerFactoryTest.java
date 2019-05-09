@@ -19,9 +19,9 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -46,7 +46,7 @@ public class NodePermissioningControllerFactoryTest {
   Collection<EnodeURL> bootnodes = Collections.emptyList();
   EnodeURL selfEnode = EnodeURL.fromString(enode);
   LocalPermissioningConfiguration localPermissioningConfig;
-  NodeSmartContractPermissioningConfiguration nodeSmartContractPermissioningConfiguration;
+  SmartContractPermissioningConfiguration smartContractPermissioningConfiguration;
   PermissioningConfiguration config;
 
   @Test
@@ -64,13 +64,13 @@ public class NodePermissioningControllerFactoryTest {
 
   @Test
   public void testCreateWithSmartContractNodePermissioningEnabledOnly() {
-    nodeSmartContractPermissioningConfiguration = new NodeSmartContractPermissioningConfiguration();
-    nodeSmartContractPermissioningConfiguration.setSmartContractAddress(
+    smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
+    smartContractPermissioningConfiguration.setNodeSmartContractAddress(
         Address.fromHexString("0x0000000000000000000000000000000000001234"));
-    nodeSmartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
     config =
         new PermissioningConfiguration(
-            Optional.empty(), Optional.of(nodeSmartContractPermissioningConfiguration));
+            Optional.empty(), Optional.of(smartContractPermissioningConfiguration));
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
@@ -112,14 +112,14 @@ public class NodePermissioningControllerFactoryTest {
     localPermissioningConfig.setNodeWhitelist(Collections.emptyList());
     localPermissioningConfig.setNodePermissioningConfigFilePath("fake-file-path");
 
-    nodeSmartContractPermissioningConfiguration = new NodeSmartContractPermissioningConfiguration();
-    nodeSmartContractPermissioningConfiguration.setSmartContractAddress(
+    smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
+    smartContractPermissioningConfiguration.setNodeSmartContractAddress(
         Address.fromHexString("0x0000000000000000000000000000000000001234"));
-    nodeSmartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
     config =
         new PermissioningConfiguration(
             Optional.of(localPermissioningConfig),
-            Optional.of(nodeSmartContractPermissioningConfiguration));
+            Optional.of(smartContractPermissioningConfiguration));
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =

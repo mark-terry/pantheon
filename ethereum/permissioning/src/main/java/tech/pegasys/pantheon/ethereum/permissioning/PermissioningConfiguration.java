@@ -16,11 +16,11 @@ import java.util.Optional;
 
 public class PermissioningConfiguration {
   private Optional<LocalPermissioningConfiguration> localConfig;
-  private Optional<NodeSmartContractPermissioningConfiguration> smartContractConfig;
+  private Optional<SmartContractPermissioningConfiguration> smartContractConfig;
 
   public PermissioningConfiguration(
       final Optional<LocalPermissioningConfiguration> localConfig,
-      final Optional<NodeSmartContractPermissioningConfiguration> smartContractConfig) {
+      final Optional<SmartContractPermissioningConfiguration> smartContractConfig) {
     this.localConfig = localConfig;
     this.smartContractConfig = smartContractConfig;
   }
@@ -29,7 +29,7 @@ public class PermissioningConfiguration {
     return localConfig;
   }
 
-  public Optional<NodeSmartContractPermissioningConfiguration> getSmartContractConfig() {
+  public Optional<SmartContractPermissioningConfiguration> getSmartContractConfig() {
     return smartContractConfig;
   }
 
