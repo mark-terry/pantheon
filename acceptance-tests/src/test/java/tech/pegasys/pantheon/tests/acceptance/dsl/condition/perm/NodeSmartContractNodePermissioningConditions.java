@@ -14,14 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.SmartContractNodePermissioningTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.NodeSmartContractNodePermissioningTransactions;
 
-public class SmartContractNodePermissioningConditions {
+public class NodeSmartContractNodePermissioningConditions {
 
-  private final SmartContractNodePermissioningTransactions transactions;
+  private final NodeSmartContractNodePermissioningTransactions transactions;
 
-  public SmartContractNodePermissioningConditions(
-      final SmartContractNodePermissioningTransactions transactions) {
+  public NodeSmartContractNodePermissioningConditions(
+      final NodeSmartContractNodePermissioningTransactions transactions) {
     this.transactions = transactions;
   }
 

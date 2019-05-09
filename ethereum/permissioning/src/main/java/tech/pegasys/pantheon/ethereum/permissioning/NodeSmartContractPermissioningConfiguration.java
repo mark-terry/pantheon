@@ -14,12 +14,12 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 
-public class SmartContractPermissioningConfiguration {
+public class NodeSmartContractPermissioningConfiguration {
   private boolean smartContractNodeWhitelistEnabled;
   private Address smartContractAddress;
 
-  public static SmartContractPermissioningConfiguration createDefault() {
-    return new SmartContractPermissioningConfiguration();
+  public static NodeSmartContractPermissioningConfiguration createDefault() {
+    return new NodeSmartContractPermissioningConfiguration();
   }
 
   public boolean isSmartContractNodeWhitelistEnabled() {

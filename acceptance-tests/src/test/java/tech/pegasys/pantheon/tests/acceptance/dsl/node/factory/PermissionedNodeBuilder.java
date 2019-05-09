@@ -21,7 +21,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
@@ -138,7 +138,7 @@ public class PermissionedNodeBuilder {
       localPermConfig = Optional.of(localConfigPermissioningConfiguration());
     }
 
-    Optional<SmartContractPermissioningConfiguration> smartContractPermConfig = Optional.empty();
+    Optional<NodeSmartContractPermissioningConfiguration> smartContractPermConfig = Optional.empty();
     if (smartContractPermissioningEnabled) {
       smartContractPermConfig = Optional.of(smartContractPermissioningConfiguration());
     }
@@ -203,9 +203,9 @@ public class PermissionedNodeBuilder {
     return localPermissioningConfiguration;
   }
 
-  private SmartContractPermissioningConfiguration smartContractPermissioningConfiguration() {
-    SmartContractPermissioningConfiguration config =
-        SmartContractPermissioningConfiguration.createDefault();
+  private NodeSmartContractPermissioningConfiguration smartContractPermissioningConfiguration() {
+    NodeSmartContractPermissioningConfiguration config =
+        NodeSmartContractPermissioningConfiguration.createDefault();
     if (permissioningSmartContractAddress != null) {
       config.setSmartContractAddress(Address.fromHexString(permissioningSmartContractAddress));
       config.setSmartContractNodeWhitelistEnabled(true);

@@ -47,7 +47,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -376,11 +376,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--permissions-nodes-contract-enabled",
         "--permissions-nodes-contract-address",
         smartContractAddress);
-    final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
-        new SmartContractPermissioningConfiguration();
-    smartContractPermissioningConfiguration.setSmartContractAddress(
+    final NodeSmartContractPermissioningConfiguration nodeSmartContractPermissioningConfiguration =
+        new NodeSmartContractPermissioningConfiguration();
+    nodeSmartContractPermissioningConfiguration.setSmartContractAddress(
         Address.fromHexString(smartContractAddress));
-    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+    nodeSmartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
@@ -388,7 +388,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
     assertThat(config.getSmartContractConfig().get())
-        .isEqualToComparingFieldByField(smartContractPermissioningConfiguration);
+        .isEqualToComparingFieldByField(nodeSmartContractPermissioningConfiguration);
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();

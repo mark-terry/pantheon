@@ -27,9 +27,9 @@ public class PermissioningConfigurationBuilder {
   public static final String ACCOUNTS_WHITELIST_KEY = "accounts-whitelist";
   public static final String NODES_WHITELIST_KEY = "nodes-whitelist";
 
-  public static SmartContractPermissioningConfiguration smartContractPermissioningConfiguration(
+  public static NodeSmartContractPermissioningConfiguration smartContractPermissioningConfiguration(
       final Address address, final boolean smartContractPermissionedNodeEnabled) {
-    SmartContractPermissioningConfiguration config = new SmartContractPermissioningConfiguration();
+    NodeSmartContractPermissioningConfiguration config = new NodeSmartContractPermissioningConfiguration();
     config.setSmartContractAddress(address);
     config.setSmartContractNodeWhitelistEnabled(smartContractPermissionedNodeEnabled);
     return config;

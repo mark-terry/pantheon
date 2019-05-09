@@ -49,12 +49,12 @@ public class NodePermissioningControllerFactory {
     }
 
     if (permissioningConfiguration.getSmartContractConfig().isPresent()) {
-      SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+      NodeSmartContractPermissioningConfiguration nodeSmartContractPermissioningConfiguration =
           permissioningConfiguration.getSmartContractConfig().get();
-      if (smartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
-        SmartContractPermissioningController smartContractProvider =
-            new SmartContractPermissioningController(
-                smartContractPermissioningConfiguration.getSmartContractAddress(),
+      if (nodeSmartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
+        NodeSmartContractPermissioningController smartContractProvider =
+            new NodeSmartContractPermissioningController(
+                nodeSmartContractPermissioningConfiguration.getSmartContractAddress(),
                 transactionSimulator);
         providers.add(smartContractProvider);
       }
