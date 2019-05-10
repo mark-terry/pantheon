@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import org.web3j.protocol.core.DefaultBlockParameterName;
 
-public class NodeSmartContractPermissioningNodeIsAllowedTransaction
+public class NodeSmartContractPermissioningIsAllowedTransaction
     implements Transaction<Boolean> {
 
   private static final BytesValue IS_NODE_ALLOWED_SIGNATURE =
@@ -38,7 +38,7 @@ public class NodeSmartContractPermissioningNodeIsAllowedTransaction
   private final Address contractAddress;
   private final Node node;
 
-  public NodeSmartContractPermissioningNodeIsAllowedTransaction(
+  public NodeSmartContractPermissioningIsAllowedTransaction(
       final Address contractAddress, final Node node) {
     this.contractAddress = contractAddress;
     this.node = node;

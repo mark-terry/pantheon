@@ -18,11 +18,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class NodeSmartContractNodePermissioningTransactions {
+public class NodeSmartContractPermissioningTransactions {
 
   private final Accounts accounts;
 
-  public NodeSmartContractNodePermissioningTransactions(final Accounts accounts) {
+  public NodeSmartContractPermissioningTransactions(final Accounts accounts) {
     this.accounts = accounts;
   }
 
@@ -37,7 +37,7 @@ public class NodeSmartContractNodePermissioningTransactions {
   }
 
   public Transaction<Boolean> isNodeAllowed(final String contractAddress, final Node node) {
-    return new NodeSmartContractPermissioningNodeIsAllowedTransaction(
+    return new NodeSmartContractPermissioningIsAllowedTransaction(
         Address.fromHexString(contractAddress), node);
   }
 
