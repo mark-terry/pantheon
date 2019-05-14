@@ -57,6 +57,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.Before;
@@ -109,7 +110,8 @@ public class EthGetFilterChangesIntegrationTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            Optional.empty());
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, protocolContext.getWorldStateArchive());
     filterManager =

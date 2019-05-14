@@ -17,9 +17,11 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.time.Clock;
+import java.util.Optional;
 
 public class TransactionPoolFactory {
 
@@ -31,7 +33,9 @@ public class TransactionPoolFactory {
       final int maxPendingTransactions,
       final MetricsSystem metricsSystem,
       final SyncState syncState,
-      final int maxTransactionRetentionHours) {
+      final int maxTransactionRetentionHours,
+      final Optional<TransactionSmartContractPermissioningController>
+          transactionSmartContractPermissioningController) {
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
@@ -49,7 +53,8 @@ public class TransactionPoolFactory {
             new TransactionSender(transactionTracker, transactionsMessageSender, ethContext),
             syncState,
             ethContext,
-            transactionTracker);
+            transactionTracker,
+            transactionSmartContractPermissioningController);
 
     final TransactionsMessageHandler transactionsMessageHandler =
         new TransactionsMessageHandler(

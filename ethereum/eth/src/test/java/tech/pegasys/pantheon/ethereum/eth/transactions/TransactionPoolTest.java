@@ -66,6 +66,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
@@ -127,7 +128,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            Optional.empty());
     blockchain.observeBlockAdded(transactionPool);
   }
 
@@ -464,7 +466,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            Optional.empty());
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transaction1 = builder.nonce(1).createTransaction(KEY_PAIR1);
@@ -528,7 +531,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            Optional.empty());
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transactionLocal = builder.nonce(1).createTransaction(KEY_PAIR1);

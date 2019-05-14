@@ -41,6 +41,7 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -54,6 +55,7 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalLong;
 
 import org.apache.logging.log4j.LogManager;
@@ -77,6 +79,8 @@ public abstract class PantheonControllerBuilder<C> {
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
   private RocksDbConfiguration rocksDbConfiguration;
+  private Optional<TransactionSmartContractPermissioningController>
+      transactionSmartContractPermissioningController = Optional.empty();
 
   public PantheonControllerBuilder<C> rocksDbConfiguration(
       final RocksDbConfiguration rocksDbConfiguration) {
@@ -158,6 +162,14 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
+  public PantheonControllerBuilder<C> transactionSmartContractPermissioningController(
+      final Optional<TransactionSmartContractPermissioningController>
+          transactionSmartContractPermissioningController) {
+    this.transactionSmartContractPermissioningController =
+        transactionSmartContractPermissioningController;
+    return this;
+  }
+
   public PantheonController<C> build() throws IOException {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
@@ -231,7 +243,8 @@ public abstract class PantheonControllerBuilder<C> {
             maxPendingTransactions,
             metricsSystem,
             syncState,
-            pendingTransactionRetentionPeriod);
+            pendingTransactionRetentionPeriod,
+            transactionSmartContractPermissioningController);
 
     final MiningCoordinator miningCoordinator =
         createMiningCoordinator(

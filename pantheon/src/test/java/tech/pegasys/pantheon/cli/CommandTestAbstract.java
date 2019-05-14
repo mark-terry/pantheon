@@ -124,6 +124,8 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.transactionSmartContractPermissioningController(any()))
+        .thenReturn(mockControllerBuilder);
 
     when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);

@@ -56,6 +56,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import io.vertx.core.Vertx;
@@ -150,7 +151,8 @@ public class TestNode implements Closeable {
             PendingTransactions.MAX_PENDING_TRANSACTIONS,
             metricsSystem,
             syncState,
-            PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+            Optional.empty());
 
     networkRunner.start();
     selfPeer = DefaultPeer.fromEnodeURL(network.getLocalEnode().get());

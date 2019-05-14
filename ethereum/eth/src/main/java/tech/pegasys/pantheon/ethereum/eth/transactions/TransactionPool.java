@@ -32,6 +32,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.account.TransactionPermissioningProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +52,7 @@ import org.apache.logging.log4j.Logger;
  *
  * <p>This class is safe for use across multiple threads.
  */
-public class TransactionPool implements BlockAddedObserver {
+public class TransactionPool implements BlockAddedObserver, TransactionPermissioningProvider {
   private static final Logger LOG = getLogger();
   private static final long SYNC_TOLERANCE = 100L;
   private final PendingTransactions pendingTransactions;
@@ -60,6 +62,8 @@ public class TransactionPool implements BlockAddedObserver {
   private final SyncState syncState;
   private Optional<AccountFilter> accountFilter = Optional.empty();
   private final PeerTransactionTracker peerTransactionTracker;
+  private final Optional<TransactionSmartContractPermissioningController>
+      transactionSmartContractPermissioningController;
 
   public TransactionPool(
       final PendingTransactions pendingTransactions,
@@ -68,13 +72,17 @@ public class TransactionPool implements BlockAddedObserver {
       final TransactionBatchAddedListener transactionBatchAddedListener,
       final SyncState syncState,
       final EthContext ethContext,
-      final PeerTransactionTracker peerTransactionTracker) {
+      final PeerTransactionTracker peerTransactionTracker,
+      final Optional<TransactionSmartContractPermissioningController>
+          transactionSmartContractPermissioningController) {
     this.pendingTransactions = pendingTransactions;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.transactionBatchAddedListener = transactionBatchAddedListener;
     this.syncState = syncState;
     this.peerTransactionTracker = peerTransactionTracker;
+    this.transactionSmartContractPermissioningController =
+        transactionSmartContractPermissioningController;
 
     ethContext.getEthPeers().subscribeConnect(this::handleConnect);
   }
@@ -95,6 +103,10 @@ public class TransactionPool implements BlockAddedObserver {
     final ValidationResult<TransactionInvalidReason> validationResult =
         validateTransaction(transaction);
 
+    if (!isPermitted(transaction)) {
+      return ValidationResult.invalid(TransactionInvalidReason.TRANSACTION_NOT_PERMITTED);
+    }
+
     validationResult.ifValid(
         () -> {
           final boolean added = pendingTransactions.addLocalTransaction(transaction);
@@ -114,7 +126,8 @@ public class TransactionPool implements BlockAddedObserver {
       final ValidationResult<TransactionInvalidReason> validationResult =
           validateTransaction(transaction);
       if (validationResult.isValid()) {
-        final boolean added = pendingTransactions.addRemoteTransaction(transaction);
+        final boolean added =
+            isPermitted(transaction) && pendingTransactions.addRemoteTransaction(transaction);
         if (added) {
           addedTransactions.add(transaction);
         }
@@ -205,12 +218,21 @@ public class TransactionPool implements BlockAddedObserver {
     return blockchain.getBlockHeader(blockchain.getChainHeadHash()).get();
   }
 
+  @Override
+  public boolean isPermitted(final Transaction transaction) {
+    // TODO: Wire up to new interface as part of PAN-2603
+    return transactionSmartContractPermissioningController
+        .map((controller) -> controller.isPermitted(transaction))
+        .orElse(true);
+  }
+
   public interface TransactionBatchAddedListener {
 
     void onTransactionsAdded(Iterable<Transaction> transactions);
   }
 
   public void setAccountFilter(final AccountFilter accountFilter) {
+    // TODO: Wire up to new interface as part of PAN-2603
     this.accountFilter = Optional.of(accountFilter);
   }
 }

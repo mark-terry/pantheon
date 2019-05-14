@@ -60,6 +60,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -758,6 +759,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
+          .transactionSmartContractPermissioningController(
+              transactionSmartContractPermissioningController())
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
@@ -1307,5 +1310,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     final Path staticNodesPath = dataDir().resolve(staticNodesFilename);
 
     return StaticNodesParser.fromPath(staticNodesPath);
+  }
+
+  private Optional<TransactionSmartContractPermissioningController>
+      transactionSmartContractPermissioningController() {
+    // TODO: Wire up configuration after it's been added
+    return Optional.empty();
   }
 }
