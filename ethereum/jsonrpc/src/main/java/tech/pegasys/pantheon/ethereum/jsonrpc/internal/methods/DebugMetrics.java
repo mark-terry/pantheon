@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
+import tech.pegasys.pantheon.metrics.PantheonMetricsSystem;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +25,9 @@ import java.util.Map;
 
 public class DebugMetrics implements JsonRpcMethod {
 
-  private final MetricsSystem metricsSystem;
+  private final PantheonMetricsSystem metricsSystem;
 
-  public DebugMetrics(final MetricsSystem metricsSystem) {
+  public DebugMetrics(final PantheonMetricsSystem metricsSystem) {
     this.metricsSystem = metricsSystem;
   }
 
